@@ -6,8 +6,11 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const links = [
+const publicLinks = [
   { to: "/", label: "Home", end: true },
+];
+
+const authLinks = [
   { to: "/trains", label: "Search trains", end: false },
   { to: "/pnr", label: "PNR status", end: false },
 ];
@@ -27,7 +30,8 @@ export function SiteHeader() {
   }
 
   const nav = [
-    ...links,
+    ...publicLinks,
+    ...(user ? authLinks : []),
     ...(user && !isAdmin ? [{ to: "/bookings", label: "My bookings", end: false }] : []),
     ...(isAdmin ? [{ to: "/admin", label: "Admin", end: false }] : []),
   ];
