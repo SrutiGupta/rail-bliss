@@ -21,6 +21,7 @@ interface AuthContextValue {
     fullName: string;
     phone?: string | undefined;
   }) => Promise<AuthUser>;
+  googleLogin: (credential: string) => Promise<AuthUser>;
   signOut: () => Promise<void>;
 }
 
@@ -78,6 +79,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const googleLogin = useCallback(async (credential: string) => {
+    const data = await http.post<{ token: string; user: AuthUser }>("/auth/google", {
+      credential,
+    });
+    setToken(data.token);
+    setUser(data.user);
+    return data.user;
+  }, []);
+
   const signOut = useCallback(async () => {
     queryClient.cancelQueries();
     queryClient.clear();
@@ -86,8 +96,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [queryClient]);
 
   const value = useMemo(
-    () => ({ user, loading, login, register, signOut }),
-    [user, loading, login, register, signOut],
+    () => ({ user, loading, login, register, googleLogin, signOut }),
+    [user, loading, login, register, googleLogin, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
