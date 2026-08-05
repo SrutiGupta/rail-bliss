@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
 
 export function HomePage() {
+  const { user } = useAuth();
+
   return (
     <section className="relative flex min-h-[calc(100vh-8rem)] flex-col justify-center overflow-hidden bg-platform text-rail-foreground">
       <div
@@ -19,24 +22,29 @@ export function HomePage() {
           a queue.
         </p>
         <div className="mt-10 flex flex-wrap gap-4">
-          <Link
-            to="/trains"
-            className="rounded-md bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
-          >
-            Search trains
-          </Link>
-          <Link
-            to="/pnr"
-            className="rounded-md border border-rail-foreground/30 px-6 py-3 text-sm font-medium transition-colors hover:bg-rail-foreground/10"
-          >
-            Check PNR status
-          </Link>
-          <Link
-            to="/auth"
-            className="rounded-md border border-rail-foreground/30 px-6 py-3 text-sm font-medium transition-colors hover:bg-rail-foreground/10"
-          >
-            Create an account
-          </Link>
+          {user ? (
+            <>
+              <Link
+                to="/trains"
+                className="rounded-md bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
+              >
+                Search trains
+              </Link>
+              <Link
+                to="/pnr"
+                className="rounded-md border border-rail-foreground/30 px-6 py-3 text-sm font-medium transition-colors hover:bg-rail-foreground/10"
+              >
+                Check PNR status
+              </Link>
+            </>
+          ) : (
+            <Link
+              to="/auth"
+              className="rounded-md bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
+            >
+              Login / Register
+            </Link>
+          )}
         </div>
       </div>
     </section>
