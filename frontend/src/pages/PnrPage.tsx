@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Search, TicketCheck } from "lucide-react";
 import { http } from "@/api/client";
 import type { PnrStatus } from "@/api/types";
@@ -27,7 +28,10 @@ export function PnrPage() {
   function submit(e: FormEvent) {
     e.preventDefault();
     const value = pnr.trim();
-    if (!/^\d{10}$/.test(value)) return;
+    if (!/^\d{10}$/.test(value)) {
+      toast.error("PNR must be exactly 10 digits");
+      return;
+    }
     mutation.mutate(value);
   }
 

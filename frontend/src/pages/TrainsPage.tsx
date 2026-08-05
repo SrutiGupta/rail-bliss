@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { TrainFront, ArrowRight } from "lucide-react";
 import { http } from "@/api/client";
@@ -11,6 +11,7 @@ import { formatDuration, formatMoney, formatTime, todayISO } from "@/lib/format"
 
 export function TrainsPage() {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const from = searchParams.get("from") ?? undefined;
   const to = searchParams.get("to") ?? undefined;
   const date = searchParams.get("date") ?? todayISO();
@@ -96,7 +97,12 @@ export function TrainsPage() {
             </div>
 
             <Button asChild disabled={t.available !== undefined && t.available <= 0}>
-              <Link to={`/book/${t.id}?date=${encodeURIComponent(date)}`}>Book now</Link>
+              <Link
+                to={`/book/${t.id}?date=${encodeURIComponent(date)}`}
+                state={{ from: location }}
+              >
+                Book now
+              </Link>
             </Button>
           </article>
         ))}

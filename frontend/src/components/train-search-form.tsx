@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { ArrowLeftRight, Search } from "lucide-react";
-import { http } from "@/api/client";
+import { useStations } from "@/api/stations";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -15,20 +14,13 @@ import {
 } from "@/components/ui/select";
 import { todayISO } from "@/lib/format";
 
-export function useStations() {
-  return useQuery({
-    queryKey: ["stations"],
-    queryFn: () => http.get<string[]>("/trains/stations"),
-  });
-}
-
 export function TrainSearchForm({
   initial,
 }: {
   initial?: { from?: string | undefined; to?: string | undefined; date?: string | undefined };
 }) {
   const navigate = useNavigate();
-  const { data: stations = [] } = useStations();
+  const { data: stations = [], isLoading: stationsLoading } = useStations();
   const [from, setFrom] = useState(initial?.from ?? "");
   const [to, setTo] = useState(initial?.to ?? "");
   const [date, setDate] = useState(initial?.date ?? todayISO());
@@ -43,70 +35,75 @@ export function TrainSearchForm({
   }
 
   return (
-    <form
-      onSubmit={submit}
-      className="grid gap-4 rounded-xl border border-border bg-card p-5 shadow-lift sm:grid-cols-[1fr_auto_1fr_auto] sm:items-end"
-    >
-      <div className="grid gap-2">
-        <Label htmlFor="from">From</Label>
-        <Select value={from} onValueChange={setFrom}>
-          <SelectTrigger id="from">
-            <SelectValue placeholder="Boarding station" />
-          </SelectTrigger>
-          <SelectContent>
-            {stations.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <form onSubmit={submit} className="rounded-xl border border-border bg-card p-5 shadow-lift">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        {/* From */}
+        <div className="grid flex-1 gap-2">
+          <Label htmlFor="from">From</Label>
+          <Select value={from} onValueChange={setFrom} disabled={stationsLoading}>
+            <SelectTrigger id="from">
+              <SelectValue placeholder={stationsLoading ? "Loading stations…" : "Boarding station"} />
+            </SelectTrigger>
+            <SelectContent>
+              {stations.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Swap */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="hidden shrink-0 self-end sm:inline-flex"
+          aria-label="Swap stations"
+          onClick={() => {
+            setFrom(to);
+            setTo(from);
+          }}
+        >
+          <ArrowLeftRight className="size-4" />
+        </Button>
+
+        {/* To */}
+        <div className="grid flex-1 gap-2">
+          <Label htmlFor="to">To</Label>
+          <Select value={to} onValueChange={setTo} disabled={stationsLoading}>
+            <SelectTrigger id="to">
+              <SelectValue placeholder={stationsLoading ? "Loading stations…" : "Destination station"} />
+            </SelectTrigger>
+            <SelectContent>
+              {stations.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Journey date */}
+        <div className="grid shrink-0 gap-2 sm:w-44">
+          <Label htmlFor="date">Journey date</Label>
+          <Input
+            id="date"
+            type="date"
+            min={todayISO()}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+
+        {/* Search */}
+        <Button type="submit" className="shrink-0 self-end gap-2">
+          <Search className="size-4" />
+          Search trains
+        </Button>
       </div>
-
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="hidden sm:inline-flex"
-        aria-label="Swap stations"
-        onClick={() => {
-          setFrom(to);
-          setTo(from);
-        }}
-      >
-        <ArrowLeftRight className="size-4" />
-      </Button>
-
-      <div className="grid gap-2">
-        <Label htmlFor="to">To</Label>
-        <Select value={to} onValueChange={setTo}>
-          <SelectTrigger id="to">
-            <SelectValue placeholder="Destination station" />
-          </SelectTrigger>
-          <SelectContent>
-            {stations.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="grid gap-2 sm:col-span-3">
-        <Label htmlFor="date">Journey date</Label>
-        <Input
-          id="date"
-          type="date"
-          min={todayISO()}
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-      </div>
-
-      <Button type="submit" className="sm:col-start-4 sm:row-start-2">
-        <Search className="size-4" /> Search trains
-      </Button>
     </form>
   );
 }

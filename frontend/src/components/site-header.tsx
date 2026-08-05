@@ -28,7 +28,7 @@ export function SiteHeader() {
 
   const nav = [
     ...links,
-    ...(user ? [{ to: "/bookings", label: "My bookings", end: false }] : []),
+    ...(user && !isAdmin ? [{ to: "/bookings", label: "My bookings", end: false }] : []),
     ...(isAdmin ? [{ to: "/admin", label: "Admin", end: false }] : []),
   ];
 

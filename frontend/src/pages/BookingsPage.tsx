@@ -40,8 +40,27 @@ export function BookingsPage() {
         Every ticket you have reserved, with its PNR and current status.
       </p>
 
+      {!user && !bookings.isLoading && (
+        <div className="mt-8 rounded-xl border border-dashed border-border p-10 text-center">
+          <Ticket className="mx-auto size-8 text-muted-foreground" />
+          <p className="mt-3 font-medium">You are not logged in</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Log in to view your booking history.
+          </p>
+          <Button asChild className="mt-4">
+            <Link to="/auth">Log in</Link>
+          </Button>
+        </div>
+      )}
+
       <div className="mt-8 space-y-4">
         {bookings.isLoading && <Skeleton className="h-40 w-full rounded-xl" />}
+
+        {bookings.isError && (
+          <p className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
+            Could not load bookings. Please refresh the page.
+          </p>
+        )}
 
         {bookings.data?.length === 0 && (
           <div className="rounded-xl border border-dashed border-border p-10 text-center">

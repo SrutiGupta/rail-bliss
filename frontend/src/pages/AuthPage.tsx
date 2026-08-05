@@ -41,7 +41,7 @@ export function AuthPage() {
     try {
       await login(parsed.data.email, parsed.data.password);
       toast.success("Logged in successfully");
-      navigate("/bookings");
+      // navigation is handled by the useEffect above when `user` is set
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -76,7 +76,7 @@ export function AuthPage() {
         phone: parsed.data.phone || undefined,
       });
       toast.success("Welcome aboard!");
-      navigate("/bookings");
+      // navigation is handled by the useEffect above when `user` is set
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Registration failed");
     } finally {
