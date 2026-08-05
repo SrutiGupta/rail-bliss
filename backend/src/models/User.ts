@@ -8,6 +8,7 @@ const userSchema = new Schema(
     passwordHash: { type: String, required: true },
     fullName: { type: String, required: true, trim: true, maxlength: 100 },
     phone: { type: String, trim: true, maxlength: 20, default: null },
+    avatar: { type: String, default: null },
     roles: { type: [roleSchema], default: [{ role: "passenger" }] },
   },
   { timestamps: true },
