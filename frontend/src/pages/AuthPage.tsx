@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { useAuth } from "@/lib/auth";
@@ -8,22 +8,79 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
+
 const credentials = z.object({
   email: z.string().trim().email("Enter a valid email address").max(255),
   password: z.string().min(6, "Password must be at least 6 characters").max(72),
 });
 
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: { credential: string }) => void;
+          }) => void;
+          renderButton: (parent: HTMLElement, config: { theme: string; size: string }) => void;
+        };
+      };
+    };
+  }
+}
+
 export function AuthPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, loading, login, register } = useAuth();
+  const { user, loading, login, register, googleLogin } = useAuth();
   const [busy, setBusy] = useState(false);
+  const googleBtnRef = useRef<HTMLDivElement>(null);
 
   const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? "/bookings";
 
   useEffect(() => {
     if (!loading && user) navigate(from, { replace: true });
   }, [user, loading, navigate, from]);
+
+  const handleGoogleCredential = useCallback(
+    async (response: { credential: string }) => {
+      setBusy(true);
+      try {
+        await googleLogin(response.credential);
+        toast.success("Logged in with Google");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Google sign-in failed");
+      } finally {
+        setBusy(false);
+      }
+    },
+    [googleLogin],
+  );
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || !googleBtnRef.current) return;
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.onload = () => {
+      window.google?.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredential,
+      });
+      window.google?.accounts.id.renderButton(googleBtnRef.current!, {
+        theme: "outline",
+        size: "large",
+      });
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, [handleGoogleCredential]);
 
   async function signIn(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,7 +98,6 @@ export function AuthPage() {
     try {
       await login(parsed.data.email, parsed.data.password);
       toast.success("Logged in successfully");
-      // navigation is handled by the useEffect above when `user` is set
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -76,18 +132,11 @@ export function AuthPage() {
         phone: parsed.data.phone || undefined,
       });
       toast.success("Welcome aboard!");
-      // navigation is handled by the useEffect above when `user` is set
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setBusy(false);
     }
-  }
-
-  function google() {
-    toast.info(
-      "Google sign-in isn't available in this build. Create an account with email and password instead.",
-    );
   }
 
   return (
@@ -127,12 +176,14 @@ export function AuthPage() {
           </TabsContent>
         </Tabs>
 
-        <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> OR <span className="h-px flex-1 bg-border" />
-        </div>
-        <Button variant="outline" className="w-full" onClick={google}>
-          Continue with Google
-        </Button>
+        {GOOGLE_CLIENT_ID && (
+          <>
+            <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="h-px flex-1 bg-border" /> OR <span className="h-px flex-1 bg-border" />
+            </div>
+            <div ref={googleBtnRef} className="flex justify-center" />
+          </>
+        )}
       </div>
     </div>
   );
