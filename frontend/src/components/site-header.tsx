@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 
 const publicLinks = [
   { to: "/", label: "Home", end: true },
+  { to: "/trains", label: "Search trains", end: false },
 ];
 
 const authLinks = [
-  { to: "/trains", label: "Search trains", end: false },
   { to: "/pnr", label: "PNR status", end: false },
 ];
 

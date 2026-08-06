@@ -38,12 +38,20 @@ export function HomePage() {
               </Link>
             </>
           ) : (
-            <Link
-              to="/auth"
-              className="rounded-md bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
-            >
-              Login / Register
-            </Link>
+            <>
+              <Link
+                to="/trains"
+                className="rounded-md bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
+              >
+                Search trains
+              </Link>
+              <Link
+                to="/auth"
+                className="rounded-md border border-rail-foreground/30 px-6 py-3 text-sm font-medium transition-colors hover:bg-rail-foreground/10"
+              >
+                Login / Register
+              </Link>
+            </>
           )}
         </div>
       </div>

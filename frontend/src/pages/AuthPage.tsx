@@ -39,6 +39,7 @@ export function AuthPage() {
   const googleBtnRef = useRef<HTMLDivElement>(null);
 
   const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? "/bookings";
+  const authMessage = (location.state as { message?: string } | null)?.message;
 
   useEffect(() => {
     if (!loading && user) navigate(from, { replace: true });
@@ -145,6 +146,12 @@ export function AuthPage() {
       <p className="mt-2 text-muted-foreground">
         Log in to book tickets and manage your reservations.
       </p>
+
+      {authMessage && (
+        <div className="mt-4 rounded-lg border border-rail/40 bg-rail/10 p-4 text-sm text-rail">
+          {authMessage}
+        </div>
+      )}
 
       <div className="mt-6 rounded-xl border border-border bg-card p-5 shadow-ticket">
         <Tabs defaultValue="login">

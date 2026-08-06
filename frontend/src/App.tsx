@@ -16,8 +16,8 @@ export default function App() {
       <Route element={<RootLayout />}>
         <Route index element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/trains" element={<TrainsPage />} />
         <Route element={<RequireAuth />}>
-          <Route path="/trains" element={<TrainsPage />} />
           <Route path="/pnr" element={<PnrPage />} />
           <Route path="/bookings" element={<BookingsPage />} />
           <Route path="/book/:trainId" element={<BookPage />} />
