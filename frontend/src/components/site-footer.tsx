@@ -20,11 +20,13 @@ export function SiteFooter() {
           </p>
         </div>
         <div>
-          <p className="font-semibold">Team</p>
+          <p className="font-semibold">Contact</p>
           <p className="mt-2 text-muted-foreground">
-            Anushree Guin · Rajnish Kumar · Sruti Gupta · Shreya Biswas
+            Developed by: Sruti Gupta
             <br />
-            Guide: Mr. Dibyadeep Nandi
+            Email: <a href="mailto:guptasruti90@gmail.com" className="text-primary hover:underline">
+              guptasruti90@gmail.com
+            </a>
           </p>
         </div>
       </div>
