@@ -24,9 +24,11 @@ export function SiteFooter() {
           <p className="mt-2 text-muted-foreground">
             Developed by: Sruti Gupta
             <br />
-            Email: <a href="mailto:guptasruti90@gmail.com" className="text-primary hover:underline">
-              guptasruti90@gmail.com
-            </a>
+            Team Members: <br />
+            1. Anushree Guin (2023-3054) <br />
+            2. Rajnish Kumar (2023-3055) <br />
+            3. Sruti Gupta (2023-3057) <br />
+            4. Shreya Biswas (2023-3058)
           </p>
         </div>
       </div>
