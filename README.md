@@ -50,9 +50,35 @@ Open http://localhost:5173.
 | Admin   | admin@railyatra.dev   | admin123     |
 | Passenger | passenger@railyatra.dev | password123 |
 
+## Google OAuth Setup (optional)
+
+To enable "Sign in with Google" on the auth page:
+
+1. Go to [Google Cloud Console — Credentials](https://console.cloud.google.com/apis/credentials)
+2. Create a new project (or select an existing one)
+3. Click **+ CREATE CREDENTIALS** → **OAuth client ID**
+4. Application type: **Web application**
+5. Name: anything (e.g. "RailYatra")
+6. Under **Authorized JavaScript origins**, click **Add URI** → `http://localhost:5173`
+7. Click **Create**
+8. Copy the **Client ID** (ends with `.apps.googleusercontent.com`)
+9. Paste it in **both** `.env` files:
+
+```sh
+# backend/.env
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+
+# frontend/.env.local
+VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+```
+
+10. Restart both backend and frontend dev servers
+
+> **Note:** The Google button only appears if `VITE_GOOGLE_CLIENT_ID` is set. If it's missing, the auth page falls back to email/password only.
+
 ## API overview
 
-- Auth: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`
+- Auth: `POST /auth/register`, `POST /auth/login`, `POST /auth/google`, `GET /auth/me`
 - Trains: `GET /trains`, `GET /trains/stations`, `GET /trains/:id`, `GET /trains/:id/availability`
 - Bookings: `POST /bookings` (runs payment gateway, issues 10-digit PNR), `GET /bookings`, `POST /bookings/:id/cancel`
 - PNR: `GET /pnr/:pnr`
